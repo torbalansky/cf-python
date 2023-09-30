@@ -113,7 +113,7 @@ or
 8. [Output](#output)
 
 ### Create a New Python Script
-Open a Python script in an editor of your choice and name it "Exercise_1.3.py".
+Open a Python script in an editor of your choice and name it "exercise_1.3.py".
 
 ### Initialize Two Empty Lists
 Begin by initializing two empty lists: `recipes_list` and `ingredients_list`.
