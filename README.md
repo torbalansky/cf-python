@@ -223,4 +223,4 @@ print_ingredients()
 
 ### Output
 
-![Output](./taks1.3/taks_output.png)
+![Output](./task1.3/task_output.png)
