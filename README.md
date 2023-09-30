@@ -120,7 +120,7 @@ Begin by initializing two empty lists: `recipes_list` and `ingredients_list`.
 
 ```python
 
-Empty lists storing recipes and ingredients
+#Empty lists storing recipes and ingredients
 recipes_list = [] # List to store recipe dictionaries
 ingredients_list = [] # List to store ingredients
 ```
