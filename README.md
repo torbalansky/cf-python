@@ -224,3 +224,247 @@ print_ingredients()
 ### Output
 
 ![Output](./task1.3/task_output.png)
+
+# Exercise 4 
+
+## Part 1
+
+### Table of Contents
+
+1. [Importing the Pickle Module](#importing-the-pickle-module)
+2. [Defining the 'take_recipe' Function](#defining-the-take-recipe-function)
+3. [Defining the 'calculate_difficulty' Function](#defining-the-calc-difficulty-function)
+4. [Attempting to Open a File](#attempting-to-open-a-file)
+5. [Taking Additional Recipes](#taking-additional-recipes)
+6. [Creating the Data Dictionary](#creating-the-data-dictionary)
+7. [Saving Data to a File](#saving-data-to-a-file)
+
+### Importing the Pickle Module
+
+```python
+import pickle
+```
+
+### Defining the 'take_recipe' Function
+
+Define a function called `take_recipe()` to receive recipes from the user. This function performs the following tasks:
+
+```python
+# Function to input a recipe from the user
+def take_recipe(recipe_number):
+    name = input(f"Enter the name of recipe {recipe_number}: ")
+    cooking_time = int(input("Enter the cooking time (in minutes): "))
+    ingredients = input("Enter ingredients separated by commas (e.g., Eggs, Salt, Pepper): ").split(", ")
+    
+    recipe = {"name": name, "cooking_time": cooking_time, "ingredients": ingredients}
+    recipes_list.append(recipe)
+    
+    # Add ingredients to the ingredients list, avoiding duplicates
+    for ingredient in ingredients:
+        if ingredient not in ingredients_list:
+            ingredients_list.append(ingredient)
+    
+    return recipe
+```
+
+### Defining the 'calculate_difficulty' Function
+
+Define the function `calculate_difficulty()`, which determines the recipe's difficulty based on specific criteria:
+
+- If cooking time is less than 10 minutes and ingredients are less than 4, set difficulty to 'Easy'.
+- If cooking time is less than 10 minutes and ingredients are 4 or more, set difficulty to 'Medium'.
+- If cooking time is 10 minutes or more and ingredients are less than 4, set difficulty to 'Intermediate'.
+- If cooking time is 10 minutes or more and ingredients are 4 or more, set difficulty to 'Hard'.
+
+```python
+# Function to calculate the difficulty of a recipe
+def calculate_difficulty(recipe):
+    if recipe["cooking_time"] < 10 and len(recipe["ingredients"]) < 4:
+        recipe["difficulty"] = "Easy"
+    elif recipe["cooking_time"] < 10 and len(recipe["ingredients"]) >= 4:
+        recipe["difficulty"] = "Medium"
+    elif recipe["cooking_time"] >= 10 and len(recipe["ingredients"]) < 4:
+        recipe["difficulty"] = "Intermediate"
+    else:
+        recipe["difficulty"] = "Hard"
+
+    return recipe
+```
+
+### Attempting to Open a File
+
+```python
+# Main code
+filename = input("Enter the filename to save your recipe data: ")
+
+try:
+    # Try to open the file for reading
+    with open(filename, 'rb') as file:
+        # Load existing data from the file using pickle
+        data = pickle.load(file)
+        recipes_list = data.get("recipes_list", [])            
+        ingredients_list = data.get("all_ingredients", [])      
+
+except FileNotFoundError:
+    # Handle the case when the file doesn't exist
+    print(f"File '{filename}' not found. Initializing new data.")
+    data = {"recipes_list": recipes_list, "all_ingredients": ingredients_list}
+```
+
+### Taking Additional Recipes
+
+Ask the user how many recipes they want to enter and use a loop to call the take_recipe() function for each recipe.
+
+```python
+# Ask the user how many recipes they want to enter
+num_recipes = int(input("How many recipes would you like to enter? "))
+
+# Loop to take recipes from the user
+for i in range(1, num_recipes + 1):
+    recipe = take_recipe(i)
+    # Calculate difficulty for the current recipe
+    calculate_difficulty(recipe)  
+```
+
+### Creating the Data Dictionary
+
+Gather the updated `recipes_list` and `all_ingredients` into a dictionary called `data`.
+
+```python
+# Update the data dictionary with the new lists
+data["recipes_list"] = recipes_list
+data["all_ingredients"] = ingredients_list
+```
+
+### Saving Data to a File
+
+Open a user-defined binary file and save the `data` using the Pickle module.
+
+```python
+# Open the file and write the updated data using pickle
+with open(filename, 'wb') as file:
+    pickle.dump(data, file)
+
+print(f"Recipe data saved to '{filename}'.")
+```
+
+## Part 2
+
+### Table of Contents
+
+1. [Importing the Pickle Module](#importing-the-pickle-module)
+2. [Defining the 'Display Recipe' Function](#defining-the-display-recipe-function)
+3. [Defining the 'Search Ingredient' Function](#defining-the-search-ingredient-function)
+4. [Asking User for Recipe File](#asking-user-for-recipe-file)
+5. [Attempting to Open User File](#attempting-to-open-user-file)
+6. [Creating the Except Block](#creating-the-except-block)
+7. [Creating the Else Block](#creating-the-else-block)
+
+### Importing the Pickle Module
+
+```python
+import pickle
+```
+
+### Defining the 'Display Recipe' Function
+
+Define a function that takes a recipe dictionary as an argument and displays its attributes, including name, cooking time, ingredients, and difficulty.
+
+```python
+# Function to display a recipe
+def display_recipe(recipe):
+    print("Recipe Name:", recipe["name"])
+    print("Cooking Time (minutes):", recipe["cooking_time"])
+    print("Ingredients:", ", ".join(recipe["ingredients"]))
+    print("Difficulty:", recipe["difficulty"])
+    print() 
+```
+
+### Defining the 'Search Ingredient' Function
+
+Define a function that takes a data dictionary as an argument.
+
+```python
+# Function to search for an ingredient in the data
+def search_ingredient(data):
+    # Print all available ingredients 
+    print("Available Ingredients:")
+    for index, ingredient in enumerate(data["all_ingredients"], 1):
+        print(f"{index}. {ingredient}")
+    
+    try:
+        # Prompt user to select an ingredient
+        ingredient_index = int(input("Enter the number of the ingredient to search: "))
+        
+        # Check if the selected index is valid
+        if 1 <= ingredient_index <= len(data["all_ingredients"]):
+            ingredient_searched = data["all_ingredients"][ingredient_index - 1]
+            print(f"Searching for recipes containing '{ingredient_searched}':\n")
+            
+            # Loop through recipes and display the ones containing the ingredient
+            for recipe in data["recipes_list"]:
+                if ingredient_searched in recipe["ingredients"]:
+                    display_recipe(recipe)
+        else:
+            print("Invalid input. Please enter a valid ingredient number.")
+    
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
+```
+
+### Asking User for Recipe File
+
+Prompt the user for the filename containing recipe data.
+
+```python
+# Main code
+filename = input("Enter the filename containing your recipe data: ")
+```
+
+### Attempting to Open User File
+
+Implement a try block to open the user-specified file and extract its contents into `data` using the Pickle module.
+
+```python
+try:
+    # Try to open the file for reading using a 'with' statement
+    with open(filename, 'rb') as file:
+        # Load existing data from the file using pickle
+        data = pickle.load(file)
+```
+
+### Creating the Except Block
+
+Handle exceptions if the try block fails and inform the user that the file was not found.
+
+```python
+except FileNotFoundError:
+    # Handle the case when the file doesn't exist
+    print(f"File '{filename}' not found. Please make sure the file exists.")
+except Exception as e:
+    print(f"An error occurred while opening the file: {e}")
+```
+
+### Creating the Else Block
+
+Define an else block that calls the `search_ingredient()` function, passing `data` as an argument.
+
+```python
+else:
+    # Call the search_ingredient function with the loaded data
+    search_ingredient(data)
+```
+
+## Part 3
+
+### Running the Input Script
+
+Execute "recipe_input.py" and enter sample recipes. Ensure that the script can generate a binary file upon execution.
+
+![Input](./task1.4/input.png)
+
+### Running the Search Script
+
+Execute "recipe_search.py," enter the ingredient to be searched for, and verify that it produces the desired output with relevant recipes.
+
+![Search](./task1.4/search.png)
