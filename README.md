@@ -637,7 +637,7 @@ for recipe in potato_recipes:
     print(recipe)
     print()
 ```
-## Run the Script
+### Run the Script
 
 Run “recipe_oop.py”.
 
