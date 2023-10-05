@@ -468,3 +468,147 @@ Execute "recipe_input.py" and enter sample recipes. Ensure that the script can g
 Execute "recipe_search.py," enter the ingredient to be searched for, and verify that it produces the desired output with relevant recipes.
 
 ![Search](./task1.4/search.png)
+
+# Exercise 5
+
+### Table of Contents
+
+1. [Define Recipe Class](#define-recipe-class)
+2. [Define Methods](#define-methods)
+3. [Create Recipe Search Method](#create-recipe-search-method)
+4. [Create a Tea Object](#create-a-tea-object)
+5. [Create More Recipes](#create-more-recipes)
+6. [Create Recipes List](#create-recipes-list)
+7. [Search and display Recipes](#search-and-display-recipes)
+8. [Run the Script](#run-the-script)
+
+### Define Recipe Class
+
+Define a class Recipe, with the following data attributes:
+
+```python
+# Define a class - recipe
+class Recipe:
+    def __init__(self, name, cooking_time):
+        self.name = name
+        self.ingredients = []
+        self.cooking_time = cooking_time
+        self.difficulty = None
+
+    # Class variable to keep track of all ingredients
+    all_ingredients = set()
+```
+
+### Define Methods
+
+```python
+    # Get and set methods for name and cooking_time
+    def get_name(self):
+        return self.name
+    
+    def set_name(self, name):
+        self.name = name
+
+    def get_cooking_time(self):
+        return self.cooking_time
+    
+    def set_cooking_time(self, cooking_time):
+        self.cooking_time = cooking_time
+
+    # Method to add ingredients
+    def add_ingredients(self, *ingredients):
+        self.ingredients.extend(ingredients)
+        self.update_all_ingredients()
+
+    # Get method for ingredients
+    def get_ingredients(self):
+        return self.ingredients
+```
+
+### Create Recipe Search Method
+
+Define a `recipe_search()` method that takes 2 parameters:
+
+```python
+    # Method to search for recipes by searching for a specific ingredient
+    def recipe_search(data, search_item):
+        found_recipes = []
+        for recipe in data:
+            if recipe.search_ingredient(search_item):
+                found_recipes.append(recipe)
+        return found_recipes
+```
+
+### Create recipes objects
+
+In the main code, make an object under the main Recipe class for Tea
+
+```python
+# Create recipe objects
+tea = Recipe('Tea', 5)
+tea.add_ingredients('Tea Leaves', 'Milk', 'Water')
+
+coffee = Recipe('Coffee', 5)
+coffee.add_ingredients('Coffee', 'Sugar', 'Water')
+
+cake = Recipe('Cake', 50)
+cake.add_ingredients('Sugar', 'Butter', 'Eggs', 'Vanilla Essence', 'Flour', 'Baking Powder', 'Milk')
+
+banana_smoothie = Recipe('Banana Smoothie', 5)
+banana_smoothie.add_ingredients('Bananas', 'Milk', 'Peanut Butter', 'Sugar', 'Ice Cubes')
+
+musaka = Recipe('Musaka', 60)
+musaka.add_ingredients('Potatoes', 'Chopped pork', 'Eggs', 'Sour Milk', 'Flour', 'Salt', 'Pepper', 'Tomato paste', 'Onion')
+```
+
+## Create Recipes List
+
+Wrap the recipes into a list called `recipes_list`.
+
+```python
+# Create a list of recipes
+recipes_list = [tea, coffee, cake, banana_smoothie, musaka]
+```
+## Search for Recipes and siplay all recipes, as well as recipes based on ingredients
+
+Use the `recipe_search()` method to search for recipes that contain each ingredient out of: Water, Sugar, Bananas.
+
+```python
+# Search for recipes containing specific ingredients
+water_recipes = recipe_search(recipes_list, 'Water')
+sugar_recipes = recipe_search(recipes_list, 'Sugar')
+banana_recipes = recipe_search(recipes_list, 'Bananas')
+potato_recipes = recipe_search(recipes_list, 'Potatoes')
+
+# Display the str representation of each recipe
+for recipe in recipes_list:
+    print(recipe)
+    print()
+
+# Display recipes containing specific ingredients
+print("Recipes containing Water:")
+for recipe in water_recipes:
+    print(recipe)
+    print()
+
+print("Recipes containing Sugar:")
+for recipe in sugar_recipes:
+    print(recipe)
+    print()
+
+print("Recipes containing Bananas:")
+for recipe in banana_recipes:
+    print(recipe)
+    print()
+
+print("Recipes containing Potatoes:")
+for recipe in potato_recipes:
+    print(recipe)
+    print()
+```
+## Run the Script
+
+Run “recipe_oop.py” and take screenshots of its execution.
+
+![output](./task1.5/output.png)
+
