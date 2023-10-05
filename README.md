@@ -484,7 +484,7 @@ Execute "recipe_search.py," enter the ingredient to be searched for, and verify 
 
 ### Define Recipe Class
 
-Define a class Recipe, with the following data attributes:
+Define a class called `Recipe`, which represents recipes with attributes like name, ingredients, cooking time, and difficulty.
 
 ```python
 # Define a class - recipe
@@ -500,6 +500,8 @@ class Recipe:
 ```
 
 ### Define Methods
+
+Define various methods within the `Recipe` class for getting and setting attributes, adding ingredients, and calculating difficulty.
 
 ```python
     # Get and set methods for name and cooking_time
@@ -527,7 +529,7 @@ class Recipe:
 
 ### Create Recipe Search Method
 
-Define a `recipe_search()` method that takes 2 parameters:
+Implement a `recipe_search()` method that allows searching for recipes based on specific ingredients.
 
 ```python
     # Method to search for recipes by searching for a specific ingredient
@@ -541,7 +543,7 @@ Define a `recipe_search()` method that takes 2 parameters:
 
 ### Create recipes objects
 
-In the main code, make an object under the main Recipe class for Tea
+Create instances of the `Recipe` class for different recipes like tea, coffee, cake, etc.
 
 ```python
 # Create recipe objects
@@ -571,7 +573,7 @@ recipes_list = [tea, coffee, cake, banana_smoothie, musaka]
 ```
 ## Search for Recipes and siplay all recipes, as well as recipes based on ingredients
 
-Use the `recipe_search()` method to search for recipes that contain each ingredient out of: Water, Sugar, Bananas.
+Utilize the `recipe_search()` method to search for recipes containing specific ingredients like Water, Sugar, Bananas, and Potatoes. Then display the recipes found, as well as all recipes.
 
 ```python
 # Search for recipes containing specific ingredients
@@ -608,7 +610,7 @@ for recipe in potato_recipes:
 ```
 ## Run the Script
 
-Run “recipe_oop.py” and take screenshots of its execution.
+Run “recipe_oop.py”.
 
 ![output](./task1.5/output.png)
 
