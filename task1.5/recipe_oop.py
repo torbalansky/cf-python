@@ -48,12 +48,15 @@ class Recipe:
             self.calculate_difficulty()
         return self.difficulty
     
+    # Search for a specific ingredient in the recipe's ingredients
     def search_ingredient(self, ingredient):
         return ingredient in self.ingredients
 
+    # Update the class-level set variable with all unique ingredients across recipes
     def update_all_ingredients(self):
         Recipe.all_ingredients.update(self.ingredients)
 
+    ## String representation of the recipe
     def __str__(self):
         ingredients_str = ", ".join(self.ingredients)
         return "Recipe: " + self.name + "\nIngredients: " + ingredients_str + "\nCooking time: " + str(self.cooking_time) + " minutes\nDifficulty: " + self.get_difficulty()

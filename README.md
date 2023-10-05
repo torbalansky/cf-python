@@ -476,11 +476,10 @@ Execute "recipe_search.py," enter the ingredient to be searched for, and verify 
 1. [Define Recipe Class](#define-recipe-class)
 2. [Define Methods](#define-methods)
 3. [Create Recipe Search Method](#create-recipe-search-method)
-4. [Create a Tea Object](#create-a-tea-object)
-5. [Create More Recipes](#create-more-recipes)
-6. [Create Recipes List](#create-recipes-list)
-7. [Search and display Recipes](#search-and-display-recipes)
-8. [Run the Script](#run-the-script)
+4. [Create Objects](#create-object)
+5. [Create Recipes List](#create-recipes-list)
+6. [Search and display Recipes](#search-and-display-recipes)
+7. [Run the Script](#run-the-script)
 
 ### Define Recipe Class
 
@@ -504,7 +503,7 @@ class Recipe:
 Define various methods within the `Recipe` class for getting and setting attributes, adding ingredients, and calculating difficulty.
 
 ```python
-    # Get and set methods for name and cooking_time
+   # Get and set methods for name and cooking_time
     def get_name(self):
         return self.name
     
@@ -525,6 +524,36 @@ Define various methods within the `Recipe` class for getting and setting attribu
     # Get method for ingredients
     def get_ingredients(self):
         return self.ingredients
+    
+    # Method to calculate difficulty based on cooking time and number of ingredients
+    def calculate_difficulty(self):
+        if self.cooking_time < 10 and len(self.ingredients) < 4:
+            self.difficulty = "Easy"
+        elif self.cooking_time < 10 and len(self.ingredients) >= 4:
+            self.difficulty = "Medium"
+        elif self.cooking_time >= 10 and len(self.ingredients) < 4:
+            self.difficulty = "Intermediate"
+        else:
+            self.difficulty = "Hard"
+
+    # Get method for difficulty
+    def get_difficulty(self):
+        if not self.difficulty:
+            self.calculate_difficulty()
+        return self.difficulty
+    
+    # Search for a specific ingredient in the recipe's ingredients
+    def search_ingredient(self, ingredient):
+        return ingredient in self.ingredients
+
+    # Update the class-level set variable with all unique ingredients across recipes
+    def update_all_ingredients(self):
+        Recipe.all_ingredients.update(self.ingredients)
+
+    ## String representation of the recipe
+    def __str__(self):
+        ingredients_str = ", ".join(self.ingredients)
+        return "Recipe: " + self.name + "\nIngredients: " + ingredients_str + "\nCooking time: " + str(self.cooking_time) + " minutes\nDifficulty: " + self.get_difficulty()
 ```
 
 ### Create Recipe Search Method
