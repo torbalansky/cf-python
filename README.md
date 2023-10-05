@@ -592,7 +592,7 @@ musaka = Recipe('Musaka', 60)
 musaka.add_ingredients('Potatoes', 'Chopped pork', 'Eggs', 'Sour Milk', 'Flour', 'Salt', 'Pepper', 'Tomato paste', 'Onion')
 ```
 
-## Create Recipes List
+### Create Recipes List
 
 Wrap the recipes into a list called `recipes_list`.
 
@@ -600,7 +600,7 @@ Wrap the recipes into a list called `recipes_list`.
 # Create a list of recipes
 recipes_list = [tea, coffee, cake, banana_smoothie, musaka]
 ```
-## Search for Recipes and siplay all recipes, as well as recipes based on ingredients
+### Search for Recipes and siplay all recipes, as well as recipes based on ingredients
 
 Utilize the `recipe_search()` method to search for recipes containing specific ingredients like Water, Sugar, Bananas, and Potatoes. Then display the recipes found, as well as all recipes.
 
