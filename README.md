@@ -643,3 +643,76 @@ Run “recipe_oop.py”.
 
 ![output](./task1.5/output.png)
 
+# Exercise 6, Part 1
+
+### Import MySQL Connector
+
+Import the `mysql` module to enable database operations.
+
+```python
+# Imports MySQL connector
+import mysql.connector
+```
+
+### Initialize Connection Object
+
+Initialize a connection object to establish a connection to the MySQL server. Use the following parameters:
+
+- Hostname: localhost
+- Username: cf-python
+- Password: password
+
+```python
+# Initializes connection to the MySQL server
+conn = mysql.connector.connect(
+    host="localhost",
+    user="cf-python",
+    passwd="password"
+)
+```
+
+### Create a Cursor
+
+Create a cursor object to interact with the database.
+
+```python 
+# Initializes the cursor object from the connection
+cursor = conn.cursor()
+```
+
+### Create a Database
+
+Create a database named `task_database` if it doesn't already exist.
+```python 
+# Creates the database if it doesn't exist
+cursor.execute("CREATE DATABASE IF NOT EXISTS task_database")
+```
+
+### Use the Database
+
+Connect to the `task_database` using the `USE` statement to specify the database for operations.
+```python 
+# Connects to the database using the USE statement
+cursor.execute("USE task_database")
+```
+
+### Create a Table
+
+Create a table named `Recipes` with specific columns:
+
+- id: INT AUTO_INCREMENT PRIMARY KEY
+- name: VARCHAR(50)
+- ingredients: VARCHAR(255)
+- cooking_time: INT
+- difficulty: VARCHAR(20)
+
+```python
+# Creates the Recipes table with specified columns
+cursor.execute("CREATE TABLE IF NOT EXISTS Recipes ("
+               "id INT AUTO_INCREMENT PRIMARY KEY,"
+               "name VARCHAR(50),"
+               "ingredients VARCHAR(255),"
+               "cooking_time INT,"
+               "difficulty VARCHAR(20)"
+               ")")
+```
