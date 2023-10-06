@@ -716,3 +716,42 @@ cursor.execute("CREATE TABLE IF NOT EXISTS Recipes ("
                "difficulty VARCHAR(20)"
                ")")
 ```
+
+# Exercise 6 Part 2
+
+### Create the Main Menu
+
+Define the function for the main menu
+
+```python 
+def main_menu(conn, cursor):
+    while True:
+        # Displays the main menu options to the user
+        print("Main Menu")
+        print("1. Create a new recipe")
+        print("2. Search for recipes by ingredients")
+        print("3. Update an existing recipe")
+        print("4. Delete a recipe")
+        print("5. Quit")
+
+        # Prompts the user for their choice
+        choice = input("Enter your choice: ")
+
+        # Checks the user's choice and performs the corresponding action
+        if choice == "1":
+            create_recipe(conn, cursor)
+        elif choice == "2":
+            search_recipe(conn, cursor)
+        elif choice == "3":
+            update_recipe(conn, cursor)
+        elif choice == "4":
+            delete_recipe(conn, cursor)
+        elif choice == "5":
+            # If the user selects option 5 (Quit), commit any changes, close the connection, and exit the program
+            conn.commit()
+            conn.close()
+            exit()
+        else:
+            # Displays an error message for an invalid choice
+            print("Invalid choice. Please enter a valid option 1-5.")
+```
