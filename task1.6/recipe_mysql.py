@@ -57,3 +57,38 @@ def main_menu(conn, cursor):
             # Displays an error message for an invalid choice
             print("Invalid choice. Please enter a valid option 1-5.")
 
+
+def create_recipe(conn, cursor):
+    # Recipe details
+    name = input("Enter the name of the recipe:")
+    cooking_time = int(input("Enter the cooking time in minutes:"))
+    ingredients = input("Enter the ingredients (comma-separated): ") .split(", ")
+
+    #Function to calculare recipe difficulty
+    def calculate_difficulty(cooking_time, ingredients):
+        if cooking_time < 10 and len(ingredients) < 4:
+            return "Easy"
+        elif cooking_time < 10 and len(ingredients) >= 4:
+            return "Medium"
+        elif cooking_time >= 10 and len(ingredients) < 4:
+            return "Intermediate"
+        else:
+            return "Hard"
+    
+    # Calculates difficulty
+    difficulty = calculate_difficulty(cooking_time, ingredients)
+
+    # Converts ingredients list to a comma-separated str
+    ingredients_str = ", ".join(ingredients)
+
+    # Builds the SQL query
+    query = "INSERT INTO Recipes (name, cooking_time, ingredients, difficulty) VALUES (%s, %s, %s, %s)"
+      
+    # Executes the query
+    cursor.execute(query, (name, cooking_time, ingredients_str, difficulty))
+
+    # Commits the changes to the DB
+    conn.commit()
+
+    print(f"Recipe '{name}' added successfully")
+

@@ -717,7 +717,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS Recipes ("
                ")")
 ```
 
-# Exercise 6 Part 2
+# Exercise 6, Part 2
 
 ### Create the Main Menu
 
@@ -754,4 +754,52 @@ def main_menu(conn, cursor):
         else:
             # Displays an error message for an invalid choice
             print("Invalid choice. Please enter a valid option 1-5.")
+```
+
+# Exercise 6, Part 3
+
+Start the Create Recipe Function
+
+```python 
+def create_recipe(conn, cursor):
+    # Recipe details
+    name = input("Enter the name of the recipe:")
+    cooking_time = int(input("Enter the cooking time in minutes:"))
+    ingredients = input("Enter the ingredients (comma-separated): ") .split(", ")
+
+```
+
+Call the calculate_difficulty() function with cooking_time and ingredients as arguments to calculate the recipe's difficulty and store the result in a variable called difficulty.
+
+```python 
+ #Function to calculare recipe difficulty
+    def calculate_difficulty(cooking_time, ingredients):
+        if cooking_time < 10 and len(ingredients) < 4:
+            return "Easy"
+        elif cooking_time < 10 and len(ingredients) >= 4:
+            return "Medium"
+        elif cooking_time >= 10 and len(ingredients) < 4:
+            return "Intermediate"
+        else:
+            return "Hard"
+    
+    # Calculates difficulty
+    difficulty = calculate_difficulty(cooking_time, ingredients)
+```
+Generate an SQL query to insert the recipe into the Recipes table in your database. Convert the ingredients list into a comma-separated string, as MySQL doesn't fully support arrays.
+
+```python 
+# Converts ingredients list to a comma-separated str
+    ingredients_str = ", ".join(ingredients)
+
+    # Builds the SQL query
+    query = "INSERT INTO Recipes (name, cooking_time, ingredients, difficulty) VALUES (%s, %s, %s, %s)"
+      
+    # Executes the query
+    cursor.execute(query, (name, cooking_time, ingredients_str, difficulty))
+
+    # Commits the changes to the DB
+    conn.commit()
+
+    print(f"Recipe '{name}' added successfully")
 ```
