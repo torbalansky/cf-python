@@ -647,7 +647,7 @@ Run “recipe_oop.py”.
 
 ### Import MySQL Connector
 
-Import the `mysql` module to enable database operations.
+- Import the `mysql` module to enable database operations.
 
 ```python
 # Imports MySQL connector
@@ -656,7 +656,7 @@ import mysql.connector
 
 ### Initialize Connection Object
 
-Initialize a connection object to establish a connection to the MySQL server. Use the following parameters:
+- Initialize a connection object to establish a connection to the MySQL server. Use the following parameters:
 
 - Hostname: localhost
 - Username: cf-python
@@ -673,7 +673,7 @@ conn = mysql.connector.connect(
 
 ### Create a Cursor
 
-Create a cursor object to interact with the database.
+- Create a cursor object to interact with the database.
 
 ```python 
 # Initializes the cursor object from the connection
@@ -682,7 +682,7 @@ cursor = conn.cursor()
 
 ### Create a Database
 
-Create a database named `task_database` if it doesn't already exist.
+- Create a database named `task_database` if it doesn't already exist.
 ```python 
 # Creates the database if it doesn't exist
 cursor.execute("CREATE DATABASE IF NOT EXISTS task_database")
@@ -690,7 +690,7 @@ cursor.execute("CREATE DATABASE IF NOT EXISTS task_database")
 
 ### Use the Database
 
-Connect to the `task_database` using the `USE` statement to specify the database for operations.
+- Connect to the `task_database` using the `USE` statement to specify the database for operations.
 ```python 
 # Connects to the database using the USE statement
 cursor.execute("USE task_database")
@@ -698,7 +698,7 @@ cursor.execute("USE task_database")
 
 ### Create a Table
 
-Create a table named `Recipes` with specific columns:
+- Create a table named `Recipes` with specific columns:
 
 - id: INT AUTO_INCREMENT PRIMARY KEY
 - name: VARCHAR(50)
@@ -721,7 +721,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS Recipes ("
 
 ### Create the Main Menu
 
-Define the function for the main menu
+- Define the function for the main menu
 
 ```python 
 def main_menu(conn, cursor):
@@ -802,4 +802,84 @@ Generate an SQL query to insert the recipe into the Recipes table in your databa
     conn.commit()
 
     print(f"Recipe '{name}' added successfully")
+```
+
+# Exercise 6, Part 4
+
+## Table of Contents
+
+### Retrieve Unique Ingredients
+- To initiate this process, the first step is to obtain a comprehensive list of ingredients available in the Recipes table. This is accomplished by executing a SQL SELECT query solely on the ingredients column of your table. The resulting data is stored in a variable named results.
+
+```python 
+# Retrieves a list of all unique ingredients from the Recipes table
+    cursor.execute("SELECT DISTINCT ingredients FROM Recipes")
+    results = cursor.fetchall()
+    all_ingredients = []
+```
+
+### Extract Unique Ingredients
+- After obtaining the list of ingredients, you proceed to extract the unique ingredients from the results variable. Each row of the results is processed, and the ingredients are split into a list. Unique ingredients are added to the all_ingredients list, ensuring that duplicates are not included.
+
+```python 
+# Extracts unique ingredients
+    for row in results:
+        ingredients_str = row[0]
+        ingredients_list = ingredients_str.split(", ")
+
+        # Adds unique ingredients to the ingredient list
+        for ingredient in ingredients_list:
+            if ingredient not in all_ingredients:
+                all_ingredients.append(ingredient)
+```
+
+### Display Available Ingredients
+- This section is responsible for displaying all available ingredients to the user. It iterates through the all_ingredients list, presenting each ingredient along with a corresponding number for user reference.
+
+```python 
+# Displays all ingredients to the user
+    print("Available ingredients:")
+    for index, ingredient in enumerate(all_ingredients, start=1):
+        print(str(index) + ". " + ingredient)
+```
+
+### Prompt User for Ingredient Selection
+- Here, the code prompts the user to select an ingredient they want to search for. It takes user input as a number corresponding to the ingredient they wish to search for. The input is validated to ensure it falls within the valid range of available ingredients.
+
+```python 
+# Prompt the user to select an ingredient to search for
+    try:
+        choice = int(input("Enter the number of the ingredient to search for: "))
+
+        if 1 <= choice <= len(all_ingredients):
+            search_ingredient = all_ingredients[choice - 1]
+```
+
+### Build SQL Query for Ingredient Search
+- After the user selects an ingredient, this section constructs an SQL query for searching recipes containing the chosen ingredient. It uses the LIKE operator with wildcard '%' to perform a partial match search within the 'ingredients' column of the Recipes table.
+
+```python 
+# Build the SQL query for searching recipes containing the chosen ingredient
+            query = "SELECT name FROM Recipes WHERE ingredients LIKE '%" + search_ingredient + "%'"
+            cursor.execute(query)
+```
+
+### Fetch and Display Search Results
+- Finally, the code fetches and displays the search results. If recipes containing the chosen ingredient are found in the database, they are printed to the console. If no matching recipes are found, a message indicating so is displayed.
+
+```python 
+# Fetches and displays the results
+            search_results = cursor.fetchall()
+
+            if search_results:
+                print("Recipes containing '" + search_ingredient + "':")
+                for row in search_results:
+                    print(row[0])
+            
+            else:
+                print("No recipes found containing '" + search_ingredient + "':")
+        else:
+            print("Invalid choice. Please enter a valid number.")
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
 ```

@@ -92,3 +92,49 @@ def create_recipe(conn, cursor):
 
     print(f"Recipe '{name}' added successfully")
 
+def search_recipe(cursor):
+    # Retrieves a list of all unique ingredients from the Recipes table
+    cursor.execute("SELECT DISTINCT ingredients FROM Recipes")
+    results = cursor.fetchall()
+    all_ingredients = []
+
+    # Extracts unique ingredients
+    for row in results:
+        ingredients_str = row[0]
+        ingredients_list = ingredients_str.split(", ")
+
+        # Adds unique ingredients to the ingredient list
+        for ingredient in ingredients_list:
+            if ingredient not in all_ingredients:
+                all_ingredients.append(ingredient)
+
+    # Displays all ingredients to the user
+    print("Available ingredients:")
+    for index, ingredient in enumerate(all_ingredients, start=1):
+        print(str(index) + ". " + ingredient)
+
+    # Prompt the user to select an ingredient to search for
+    try:
+        choice = int(input("Enter the number of the ingredient to search for: "))
+
+        if 1 <= choice <= len(all_ingredients):
+            search_ingredient = all_ingredients[choice - 1]
+            
+            # Build the SQL query for searching recipes containing the chosen ingredient
+            query = "SELECT name FROM Recipes WHERE ingredients LIKE '%" + search_ingredient + "%'"
+            cursor.execute(query)
+
+            # Fetches and displays the results
+            search_results = cursor.fetchall()
+
+            if search_results:
+                print("Recipes containing '" + search_ingredient + "':")
+                for row in search_results:
+                    print(row[0])
+            
+            else:
+                print("No recipes found containing '" + search_ingredient + "':")
+        else:
+            print("Invalid choice. Please enter a valid number.")
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
