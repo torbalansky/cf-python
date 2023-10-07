@@ -945,6 +945,7 @@ def update_recipe(conn, cursor):
 
 ### Collect the New Value From User:
   - Once the user selects the column requiring an update, gather the new value from the user.
+  - Note that if the user updates either cooking_time or ingredients, the script will also recalculate the recipe's difficulty and update that column accordingly.
 
 ```python 
     # Prompts the user for a new value
@@ -975,7 +976,6 @@ def update_recipe(conn, cursor):
 
 ### Build Queries:
   - Construct a query in the form of a string to update an entry in the table, considering the provided ID, column, and the updated value.
-  - Note that if the user updates either cooking_time or ingredients, the script will also recalculate the recipe's difficulty and update that column accordingly (create a separate query for this).
   - Execute the constructed query and commit the changes to the database table.
 
 ```python 
@@ -1046,3 +1046,21 @@ def display_recipes(cursor):
             print("Difficulty:", row[4])
 ```
 ## Part 8
+
+### Run Script
+ - Ensure that your MySQL server is running on your system. Thereafter, run your script.
+![step 1](./task1.6/part8_step1_main_menu.png)
+### Add Recipes
+ - Create recipe/s of your choice using the first option in your menu.
+![step 2](./task1.6/part8_step2_create.png)
+### Run a Search
+ - Run a search by selecting the ingredient to search for.
+![step 3](./task1.6/part8_step3_search.png)
+### Update a Recipe
+ - Change a few values in some of your recipes.
+![step 4](./task1.6/part8_step4_update.png)
+
+### Delete a Recipe (Display the remaining recipes - Optional)
+![step 5](./task1.6/part8_step5_delete.png)
+### Exit
+![step 6](./task1.6/exit.png)
