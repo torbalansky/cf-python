@@ -42,11 +42,11 @@ class Recipe(Base):
 
     # Define a method to calculate recipe difficulty
     def calculate_difficulty(self):
-        if self.cooking_time < 10 and len(self.ingredients) < 4:
+        if self.cooking_time < 10 and len(self.return_ingredients_as_list()) < 4:
             self.difficulty = "Easy"
-        elif self.cooking_time < 10 and len(self.ingredients) >= 4:
+        elif self.cooking_time < 10 and len(self.return_ingredients_as_list()) >= 4:
             self.difficulty = "Medium"
-        elif self.cooking_time >= 10 and len(self.ingredients) < 4:
+        elif self.cooking_time >= 10 and len(self.return_ingredients_as_list()) < 4:
             self.difficulty = "Intermediate"
         else:
             self.difficulty = "Hard"
@@ -60,3 +60,68 @@ class Recipe(Base):
 
 # Create the corresponding table in the database
 Base.metadata.create_all(engine)
+
+def print_result_message(success=True, message="", exception=None):
+    # This function prints a success or failure message based on the 'success' parameter
+    if success:
+        print()
+        print("Operation successful!")
+        print()
+    else:
+        print()
+        print(f"Operation failed: {message}")
+        if exception:
+            print(f"Error details: {exception}")
+        print()
+
+def create_recipe(session):
+    try:
+        # Recipe details
+        name = input("Enter the name of the recipe:")
+
+        if len(name) > 50:
+            print("Recipe name is too long (max 50 characters).")
+            return
+        
+        ingredients = []
+        num_ingredients = int(input("Enter the number of ingredients:"))
+        for i in range(num_ingredients):
+            ingredient = input(f"Enter ingredient {i + 1}: ")
+            ingredients.append(ingredient)
+
+        ingredients_str = ", ".join(ingredients)
+
+        # Check if cooking time is a valid number
+        try:
+            cooking_time = int(input("Enter cooking time (in minutes): "))
+        except ValueError:
+            print("Invalid cooking time. Please enter a valid number!")
+            return
+        
+        # Create a new recipe object
+        recipe_entry = Recipe(name=name, ingredients=ingredients_str, cooking_time=cooking_time)
+
+        # Calculate and set difficulty
+        recipe_entry.calculate_difficulty()
+
+        # Add the recipe to the database and commit the change
+        session.add(recipe_entry)
+        session.commit()
+
+        # Print success message
+        print_result_message(success=True)
+
+    except Exception as e:
+        # Print error message with exception details
+        print_result_message(success=False, message="There was an error creating the recipe:", exception=e)
+
+def view_all_recipes(session):
+    # Retrieve all recipes from the DB and display them
+    recipes = session.query(Recipe).all()
+
+    if not recipes:
+        print("No recipes were found in the database!")
+        return
+    
+    for recipe in recipes:
+        print(recipe)
