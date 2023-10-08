@@ -377,3 +377,43 @@ def delete_recipe(session):
 
     except Exception as e:
         print_result_message(success=False, message="There was an error deleting the recipe:", exception=e)
+
+
+def main_menu(session, engine):
+    while True:
+        # Display the main menu options
+        print("\n==========================================")
+        print("\nMain Menu:")
+        print("1. Create a new recipe")
+        print("2. View all recipes")
+        print("3. Search recipe by ingredient")
+        print("4. Edit a recipe")
+        print("5. Delete a recipe")
+        print("6. Exit")
+        print("===========================================\n")
+
+
+        # Get the user's choice
+        choice = input("Enter your choice: ")
+
+         # Process user's choice
+        if choice == "1":
+            create_recipe(session)
+        elif choice == "2":
+            view_all_recipes(session)
+        elif choice == "3":
+            search_by_ingredients(session)
+        elif choice == "4":
+            edit_recipe(session)
+        elif choice == "5":
+            delete_recipe(session)
+        elif choice == "6":
+            print("Bye!")
+            session.close()
+            engine.dispose()
+            break
+        else:
+            print("Invalid choice. Please select a valid option.")
+
+if __name__ == "__main__":
+    main_menu(session, engine)
