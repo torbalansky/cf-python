@@ -1484,6 +1484,7 @@ if __name__ == "__main__":
  - Output: Search recipe by ingredient/s
     ![step 3](./task1.7/Task1.7_search_by_ingredient.png)
  - Output: Edit a recipe
+    - 
     ![step 4](./task1.7/Task1.7_update.png)
  - Output: Delete a recipe
     ![step 5](./task1.7/Task1.7_delete.png)
