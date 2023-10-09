@@ -1064,3 +1064,428 @@ def display_recipes(cursor):
 ![step 5](./task1.6/part8_step5_delete.png)
 ### Exit
 ![step 6](./task1.6/exit.png)
+
+# Exercise 7
+
+## Part 1
+
+- Create Recipe App
+  - In a file called recipe_app.py import all the packages and methods necessary to build the recipe application.
+
+```python 
+# Displays all recipes available
+# Import necessary modules from SQLAlchemy
+from sqlalchemy import create_engine, Column, Integer, String, or_, and_
+from sqlalchemy.orm import sessionmaker, declarative_base
+```
+
+- Create an engine
+  
+```python 
+# Create an SQLAlchemy engine to connect to the MySQL DB
+engine = create_engine("mysql://cf-python:password@localhost/task_database")
+```
+
+- Create the Session Object and declarative base class
+ ```python 
+# Create a Session class that binds to the DB engine
+Session = sessionmaker(bind=engine)
+
+# Create a session object, which will be used for DB interactions
+session = Session()
+
+# Create a declarative base class
+Base = declarative_base()
+```
+## Part 2
+
+- Define an attribute to set the table’s name as final_recipes  and  create table columns
+    - id: integer; primary key; increments itself automatically.
+    - name: string with 50-character limit; stores the recipe’s name. 
+    - ingredients: string type; character limit of 255; stores the ingredients of the recipe in the form of a string.
+    - cooking_time: integer; stores the recipe’s cooking time in minutes
+    - difficulty: string with 20-character limit; stores one of four strings that describe the difficulty of the recipe (Easy; Medium; Intermediate; Hard).
+
+ ```python 
+# Define the Recipe class as a model
+class Recipe(Base):
+    # Set the table name
+    __tablename__ = "final_recipes"
+
+    # Define columns for the table
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50))
+    ingredients = Column(String(255))
+    cooking_time = Column(Integer)
+    difficulty = Column(String(20))
+
+    # Define a representation method for debugging
+    def __repr__(self):
+        return "<Recipe ID: " + str(self.id) + "-" + self.name + ">"
+    
+    # Define a string representation method for user output
+    def __str__(self):
+        return (
+            f"Recipe ID: {self.id}\n"
+            f"Name: {self.name}\n"
+            f"Ingredients: {self.ingredients}\n"
+            f"Cooking Time: {self.cooking_time} minutes\n"
+            f"Difficulty: {self.difficulty}"
+        )
+
+    # Define a method to calculate recipe difficulty
+    def calculate_difficulty(self):
+        if self.cooking_time < 10 and len(self.return_ingredients_as_list()) < 4:
+            self.difficulty = "Easy"
+        elif self.cooking_time < 10 and len(self.return_ingredients_as_list()) >= 4:
+            self.difficulty = "Medium"
+        elif self.cooking_time >= 10 and len(self.return_ingredients_as_list()) < 4:
+            self.difficulty = "Intermediate"
+        else:
+            self.difficulty = "Hard"
+
+    # Define a method to return ingredients as a list
+    def return_ingredients_as_list(self):
+        if not self.ingredients:
+            return []
+        else:
+            return self.ingredients.split(", ")
+
+# Create the corresponding table in the database
+Base.metadata.create_all(engine)
+```
+
+## Part 3
+
+### Create recipe functions
+
+ - Function 1: create_recipe()
+
+```python 
+def create_recipe(session):
+    try:
+        # Recipe details
+        name = input("Enter the name of the recipe:")
+
+        if len(name) > 50:
+            print("Recipe name is too long (max 50 characters).")
+            return
+        
+        ingredients = []
+        num_ingredients = int(input("Enter the number of ingredients:"))
+        for i in range(num_ingredients):
+            ingredient = input(f"Enter ingredient {i + 1}: ")
+            ingredients.append(ingredient)
+
+        ingredients_str = ", ".join(ingredients)
+
+        # Check if cooking time is a valid number
+        try:
+            cooking_time = int(input("Enter cooking time (in minutes): "))
+        except ValueError:
+            print("Invalid cooking time. Please enter a valid number!")
+            return
+        
+        # Create a new recipe object
+        recipe_entry = Recipe(name=name, ingredients=ingredients_str, cooking_time=cooking_time)
+
+        # Calculate and set difficulty
+        recipe_entry.calculate_difficulty()
+
+        # Add the recipe to the database and commit the change
+        session.add(recipe_entry)
+        session.commit()
+
+        # Print success message
+        print_result_message(success=True)
+
+    except Exception as e:
+        # Print error message with exception details
+        print_result_message(success=False, message="There was an error creating the recipe:", exception=e)
+```
+
+ - Function 2: view_all_recipes()
+
+```python 
+def view_all_recipes(session):
+    # Retrieve all recipes from the DB and display them
+    recipes = session.query(Recipe).all()
+
+    if not recipes:
+        print("No recipes were found in the database!")
+        return
+    
+    for recipe in recipes:
+        print("+" * 40)
+        print(recipe)
+```
+
+ - Function 3: search_by_ingredients()
+
+```python 
+def search_by_ingredients(session):
+    try:
+        # Check if there are any entries in the table
+        if session.query(Recipe).count() == 0:
+            print("No recipes found in the database.")
+            return
+
+        # Retrieve values from the 'ingredients' column
+        results = session.query(Recipe.ingredients).all()
+
+        all_ingredients = set()
+        for result in results:
+            ingredients_list = result[0].split(', ')
+            all_ingredients.update(ingredients_list)
+
+        # Display the available ingredients to the user
+        print("Available ingredients:")
+        for index, ingredient in enumerate(all_ingredients, start=1):
+            print(f"{index}. {ingredient}")
+
+        # Ask the user for ingredient choices
+        ingredient_choices = input("Enter ingredient numbers separated by spaces: ").split()
+        
+        # Convert user input to integers
+        ingredient_choices = [int(choice) for choice in ingredient_choices]
+
+        # Validate user input
+        if not all(1 <= choice <= len(all_ingredients) for choice in ingredient_choices):
+            print("Invalid ingredient choice. Please enter valid numbers.")
+            return
+
+        # Get the selected ingredients as strings
+        search_ingredients = [list(all_ingredients)[choice - 1] for choice in ingredient_choices]
+
+        # Initialize a list of search conditions for at least one ingredient
+        any_conditions = []
+        for ingredient in search_ingredients:
+            like_term = f"%{ingredient}%"
+            any_conditions.append(Recipe.ingredients.like(like_term))
+
+        # Query the database for recipes containing at least one selected ingredient
+        any_matching_recipes = session.query(Recipe).filter(or_(*any_conditions)).all()
+
+        # Initialize a list of search conditions for every ingredient
+        all_conditions = []
+        for ingredient in search_ingredients:
+            like_term = f"%{ingredient}%"
+            all_conditions.append(Recipe.ingredients.like(like_term))
+
+        # Query the database for recipes containing every selected ingredient
+        all_matching_recipes = session.query(Recipe).filter(and_(*all_conditions)).all()
+
+        print("\nRecipes containing at least one selected ingredient:")
+        if any_matching_recipes:
+            for recipe in any_matching_recipes:
+                print(recipe)
+        else:
+            print("No recipes found containing at least one selected ingredient.")
+
+        print("\nRecipes containing every selected ingredient:")
+        if all_matching_recipes:
+            for recipe in all_matching_recipes:
+                print(recipe)
+        else:
+            print("No recipes found containing every selected ingredient.")
+
+    except Exception as e:
+        print_result_message(success=False, message="An error occurred while searching for recipes:", exception=e)
+```
+
+ - Function 4: edit_recipe()
+
+```python 
+def edit_recipe(session):
+    try:
+        # Check if any recipes exist in the DB
+        recipes = session.query(Recipe).all()
+        if not recipes:
+            print("No recipes were found.")
+            return
+        
+        # Display the list of recipes to choose from
+        print("\nRecipes")
+        for i, recipe in enumerate(recipes, start=1):
+            print(f"{i}. {recipe.name}")
+        
+        # Ask the user to select a recipe by number
+        choice = input("Enter the number of the recipe to edit (or 'q' to quit): ")
+        if choice.lower() == 'q':
+            return
+        
+        try: 
+            choice = int(choice)
+            if 1 <= choice <= len(recipes):
+                # Retrieve the selected recipe
+                recipe_to_edit = recipes[choice - 1]
+
+                # Display the selected recipe details
+                print("\nSelected Recipe: ")
+                print(recipe_to_edit)
+
+                # Ask the user which attribute to edit
+                attribute = input("\nEnter the number of the attribute to edit:"
+                                  "\n1. Name\n2. Ingredients\n3. Cooking Time\n"
+                                  "Or press 'q' to quit editing: ")
+                
+                if attribute.lower() == 'q':
+                    return
+                
+                try:
+                    attribute = int(attribute)
+                    if attribute == 1:
+                        # Edit recipe name
+                        new_name = input("Enter the new name of the recipe: ")
+                        if len(new_name) > 50:
+                            print("Recipe name is too long (max 50 characters).")
+                        else:
+                            recipe_to_edit.name = new_name
+                            session.commit()
+                            print_result_message(success=True)
+                    elif attribute == 2:
+                        # Edit ingredients
+                        num_ingredients = int(input("Enter the number of ingredients: "))
+                        new_ingredients = []
+                        for i in range(num_ingredients):
+                            ingredient = input(f"Enter ingredient {i + 1}: ")
+                            new_ingredients.append(ingredient)
+                        recipe_to_edit.ingredients = ", ".join(new_ingredients)
+                        
+                        # Recalculate difficulty after updating ingredients
+                        recipe_to_edit.calculate_difficulty()
+                        
+                        session.commit()
+                        print_result_message(success=True)
+                    elif attribute == 3:
+                        new_cooking_time = input("Enter the new cooking time in minutes: ")
+                        try:
+                            new_cooking_time = int(new_cooking_time)
+                            recipe_to_edit.cooking_time = new_cooking_time
+                            recipe_to_edit.calculate_difficulty()
+                            session.commit()
+                            print_result_message(success=True)
+                        except ValueError:
+                            print("Invalid cooking time. Please enter a valid number.")
+                    else:
+                        print("Invalid attribute choice. Please enter a valid number (1, 2, or 3).")
+                except ValueError:
+                    print("Invalid attribute choice. Please enter a valid number (1, 2, or 3).")
+            else:
+                print("Invalid recipe choice. Please enter a valid number.")
+        except ValueError:
+            print("Invalid recipe choice. Please enter a valid number.")
+
+    except Exception as e:
+        print_result_message(success=False, message="There was an error editing the recipe:", exception=e)
+```
+
+ - Function 5: delete_recipe()
+
+```python 
+def delete_recipe(session):
+    try:
+        # Check the available recipes in the DB
+        recipes = session.query(Recipe).all()
+        if not recipes:
+            print("No recipes found in the database.")
+            return
+
+        # Display a list of recipes to choose from
+        print("\nRecipes:")
+        for i, recipe in enumerate(recipes, start=1):
+            print(f"{i}. {recipe.name}")
+
+        # Ask the user to select a recipe by number
+        choice = input("Enter the number of the recipe to delete (or 'q' to quit): ")
+        if choice.lower() == 'q':
+            return
+
+        try:
+            choice = int(choice)
+            if 1 <= choice <= len(recipes):
+                # Retrieve the selected recipe
+                recipe_to_delete = recipes[choice - 1]
+
+                # Display the selected recipe's details
+                print("\nSelected Recipe:")
+                print(recipe_to_delete)
+
+                # Ask for confirmation
+                confirm = input("Are you sure you want to delete this recipe? (yes/no): ").lower()
+                if confirm == "yes":
+                    session.delete(recipe_to_delete)
+                    session.commit()
+                    print_result_message(success=True)
+                elif confirm == "no":
+                    print("Recipe deletion canceled.")
+                else:
+                    print("Invalid choice. Please enter 'yes' or 'no'.")
+            else:
+                print("Invalid recipe choice. Please enter a valid number.")
+        except ValueError:
+            print("Invalid recipe choice. Please enter a valid number.")
+
+    except Exception as e:
+        print_result_message(success=False, message="There was an error deleting the recipe:", exception=e)
+```
+
+## Part 4
+
+ - Create the Main Menu. 
+
+```python 
+def main_menu(session, engine):
+    while True:
+        # Display the main menu options
+        print("\n==========================================")
+        print("\nMain Menu:")
+        print("1. Create a new recipe")
+        print("2. View all recipes")
+        print("3. Search recipe by ingredient")
+        print("4. Edit a recipe")
+        print("5. Delete a recipe")
+        print("6. Exit")
+        print("===========================================\n")
+
+
+        # Get the user's choice
+        choice = input("Enter your choice: ")
+
+         # Process user's choice
+        if choice == "1":
+            create_recipe(session)
+        elif choice == "2":
+            view_all_recipes(session)
+        elif choice == "3":
+            search_by_ingredients(session)
+        elif choice == "4":
+            edit_recipe(session)
+        elif choice == "5":
+            delete_recipe(session)
+        elif choice == "6":
+            print("Bye!")
+            session.close()
+            engine.dispose()
+            break
+        else:
+            print("Invalid choice. Please select a valid option.")
+
+if __name__ == "__main__":
+    main_menu(session, engine)
+```
+
+## Part 5
+
+ - Output: Create a few recipes
+    ![step 1](./task1.7/Task1.7_create.png)
+ - Output: View all recipes
+    ![step 2](./task1.7/Task1.7_view_all.png)
+ - Output: Search recipe by ingredient/s
+    ![step 3](./task1.7/Task1.7_search_by_ingredient.png)
+ - Output: Edit a recipe
+    ![step 4](./task1.7/Task1.7_update.png)
+ - Output: Delete a recipe
+    ![step 5](./task1.7/Task1.7_delete.png)
+ - Output: Exit the app
+    ![step 6](./task1.7/Task1.7_exit.png)
