@@ -1478,15 +1478,14 @@ if __name__ == "__main__":
 ## Part 5
 
  - Output: Create a few recipes
-    ![step 1](./task1.7/Task1.7_create.png)
+    - ![step 1](./task1.7/Task1.7_create.png)
  - Output: View all recipes
-    ![step 2](./task1.7/Task1.7_view_all.png)
+    - ![step 2](./task1.7/Task1.7_view_all.png)
  - Output: Search recipe by ingredient/s
-    ![step 3](./task1.7/Task1.7_search_by_ingredient.png)
+    - ![step 3](./task1.7/Task1.7_search_by_ingredient.png)
  - Output: Edit a recipe
-    - 
-    ![step 4](./task1.7/Task1.7_update.png)
+    - ![step 4](./task1.7/Task1.7_update.png)
  - Output: Delete a recipe
-    ![step 5](./task1.7/Task1.7_delete.png)
+    - ![step 5](./task1.7/Task1.7_delete.png)
  - Output: Exit the app
-    ![step 6](./task1.7/Task1.7_exit.png)
+    - ![step 6](./task1.7/Task1.7_exit.png)
